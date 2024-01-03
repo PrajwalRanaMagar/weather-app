@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import axios from "axios";
-import { format, parseISO } from "date-fns";
+import { format, fromUnixTime, parseISO } from "date-fns";
 import Image from "next/image";
 // import { useQuery } from '@tanstack/react-query';
 import { useQuery } from "react-query";
@@ -10,6 +10,9 @@ import Container from "./../components/Container";
 import { convertKelvinToCelsius } from "@/utils/convertKelvinToCelsius";
 import WeatherIcon from "@/components/WeatherIcon";
 import { getDayOrNightIcon } from "./../utils/getDayOrNightIcon";
+import WeatherDetails from "@/components/WeatherDetails";
+import { metersToKilometers } from "@/utils/metersToKilometers";
+import { convertWindSpeed } from "@/utils/convertWindSpeed";
 
 // http://api.openweathermap.org/data/2.5/forecast?id=524901&appid=05016ee12b542724dfab9e2d113a601a
 
@@ -149,6 +152,37 @@ export default function Home() {
                 ))}
               </div>
             </Container>
+          </div>
+          <div className="flex gap-4">
+            {/* left */}
+            <Container className="w-fit justify-center flex-col px-4 items-center">
+              <p className="capitalize text-center">
+                {firstData?.weather[0].description}{" "}
+              </p>
+              <WeatherIcon
+                iconName={getDayOrNightIcon(
+                  firstData?.weather[0].icon ?? "",
+                  firstData?.dt_txt ?? ""
+                )}
+              />
+            </Container>
+            <Container className="bg-yellow-300/80 px-6 gap-4 justify-between overflow-x-auto">
+              <WeatherDetails
+                visability={metersToKilometers(firstData?.visibility ?? 10000)}
+                airPressure={`${firstData?.main.pressure} hPa`}
+                humidity={`${firstData?.main.humidity}%`}
+                sunrise={format(
+                  fromUnixTime(data?.city.sunrise ?? 1702949452),
+                  "H:mm"
+                )}
+                sunset={format(
+                  fromUnixTime(data?.city.sunset ?? 1702949452),
+                  "H:mm"
+                )}
+                windSpeed={convertWindSpeed(firstData?.wind.speed ?? 1.64)}
+              />
+            </Container>
+            {/* right */}
           </div>
         </section>
 
